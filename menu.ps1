@@ -92,9 +92,10 @@ function Mostrar-Menu {
     Write-Host ""
     Write-Host "  1. Abrir OpenCode con perfil activo"
     Write-Host "  2. Cambiar perfil"
-    Write-Host "  3. Ver modelos disponibles"
-    Write-Host "  4. Ver perfil activo"
-    Write-Host "  5. Salir"
+    Write-Host "  3. Elegir modelo segun tarea"
+    Write-Host "  4. Ver modelos disponibles"
+    Write-Host "  5. Ver perfil activo"
+    Write-Host "  6. Salir"
     Write-Host ""
 }
 
@@ -178,9 +179,14 @@ function Ver-Modelos {
     Write-Host ""
     Write-Host "  OPENROUTER (modelos gratis con cuenta Google/GitHub)" -ForegroundColor Cyan
     Write-Host "  openrouter/meta-llama/llama-3.3-70b-instruct:free"
+    Write-Host "  openrouter/mistralai/mistral-small-3.2-24b:free  codigo, equilibrado"
     Write-Host "  openrouter/mistralai/mistral-7b-instruct:free"
-    Write-Host "  openrouter/deepseek/deepseek-chat-v3-0324:free   (chino, muy capaz)"
-    Write-Host "  openrouter/qwen/qwen3-235b-a22b:free             (chino, bueno para codigo)"
+    Write-Host "  openrouter/deepseek/deepseek-chat-v3-0324:free   chino, muy capaz"
+    Write-Host "  openrouter/tngtech/deepseek-r1t-chimera:free      razonamiento + rapidez"
+    Write-Host "  openrouter/qwen/qwen3-235b-a22b:free             chino, bueno para codigo"
+    Write-Host "  openrouter/google/gemini-2.0-flash-exp:free      velocidad + multimodal"
+    Write-Host "  openrouter/google/gemma-3-27b-it:free            instrucciones precisas"
+    Write-Host "  openrouter/microsoft/phi-4-reasoning:free        razonamiento paso a paso"
     Write-Host ""
     Write-Host "  ANTHROPIC / CLAUDE (pago)" -ForegroundColor Cyan
     Write-Host "  anthropic/claude-sonnet-4-6      recomendado"
@@ -193,6 +199,50 @@ function Ver-Modelos {
     Write-Host "  Para cambiar modelo edita: $CONFIG_FILE"
     Write-Host ""
     Read-Host "Presiona Enter para volver"
+}
+
+function Elegir-Por-Tarea {
+    $tareas = @(
+        @{ desc = "Skill con flujo claro (mecanico)";      modelo = "groq/llama-3.3-70b-versatile" },
+        @{ desc = "Expandir estilos a otras pages";        modelo = "groq/llama-3.3-70b-versatile" },
+        @{ desc = "Refactor simple / renombrar / mover";   modelo = "groq/llama-3.1-8b-instant" },
+        @{ desc = "Respuesta rapida / consulta puntual";   modelo = "groq/llama-3.1-8b-instant" },
+        @{ desc = "Redisenar page con criterio propio";    modelo = "openrouter/deepseek/deepseek-chat-v3-0324:free" },
+        @{ desc = "Arquitectura / decidir estructura";     modelo = "openrouter/deepseek/deepseek-chat-v3-0324:free" },
+        @{ desc = "Debuggear algo raro / logica compleja"; modelo = "openrouter/qwen/qwen3-235b-a22b:free" },
+        @{ desc = "Razonamiento paso a paso";              modelo = "openrouter/microsoft/phi-4-reasoning:free" },
+        @{ desc = "Tarea rapida multimodal (imagen+texto)";modelo = "openrouter/google/gemini-2.0-flash-exp:free" }
+    )
+
+    Clear-Host
+    Write-Host "============================================"
+    Write-Host "   Elegir modelo segun tarea"
+    Write-Host "============================================"
+    Write-Host ""
+    for ($i = 0; $i -lt $tareas.Count; $i++) {
+        Write-Host "  $($i + 1). $($tareas[$i].desc)"
+    }
+    Write-Host ""
+    $sel = Read-Host "Que quieres hacer? (1-$($tareas.Count))"
+    $idx = [int]$sel - 1
+    if ($idx -ge 0 -and $idx -lt $tareas.Count) {
+        $tarea  = $tareas[$idx]
+        $modelo = $tarea.modelo
+        Crear-Dirs
+        $config = @{ model = $modelo }
+        $config | ConvertTo-Json -Depth 3 | Set-Content $CONFIG_FILE -Encoding UTF8
+        Write-Host ""
+        Write-Host "  Tarea:  $($tarea.desc)" -ForegroundColor Cyan
+        Write-Host "  Modelo: $modelo" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "  config.json actualizado. Abriendo OpenCode..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 1
+        Clear-Host
+        & opencode
+    } else {
+        Write-Host "Opcion invalida." -ForegroundColor Red
+        Start-Sleep -Milliseconds 800
+    }
 }
 
 function Ver-PerfilActivo {
@@ -255,7 +305,7 @@ if (Test-Path $AUTH_FILE) {
 
 while ($true) {
     Mostrar-Menu $perfiles $perfilActivo
-    $op = Read-Host "Elige una opcion (1-5)"
+    $op = Read-Host "Elige una opcion (1-6)"
 
     switch ($op) {
         "1" {
@@ -275,9 +325,10 @@ while ($true) {
             $nuevo = Menu-Perfiles $perfiles
             if ($nuevo) { $perfilActivo = $nuevo }
         }
-        "3" { Ver-Modelos }
-        "4" { Ver-PerfilActivo }
-        "5" { exit }
+        "3" { Elegir-Por-Tarea }
+        "4" { Ver-Modelos }
+        "5" { Ver-PerfilActivo }
+        "6" { exit }
         default {
             Write-Host "Opcion invalida." -ForegroundColor Red
             Start-Sleep -Milliseconds 500
