@@ -226,19 +226,43 @@ function Elegir-Por-Tarea {
     $sel = Read-Host "Que quieres hacer? (1-$($tareas.Count))"
     $idx = [int]$sel - 1
     if ($idx -ge 0 -and $idx -lt $tareas.Count) {
-        $tarea  = $tareas[$idx]
-        $modelo = $tarea.modelo
+        $tareaActual = $tareas[$idx]
+        $modelo      = $tareaActual.modelo
         Crear-Dirs
         $config = @{ model = $modelo }
         $config | ConvertTo-Json -Depth 3 | Set-Content $CONFIG_FILE -Encoding UTF8
-        Write-Host ""
-        Write-Host "  Tarea:  $($tarea.desc)" -ForegroundColor Cyan
-        Write-Host "  Modelo: $modelo" -ForegroundColor Green
-        Write-Host ""
-        Write-Host "  config.json actualizado. Abriendo OpenCode..." -ForegroundColor Yellow
-        Start-Sleep -Seconds 1
-        Clear-Host
-        & opencode
+
+        while ($true) {
+            Write-Host ""
+            Write-Host "  Tarea:  $($tareaActual.desc)" -ForegroundColor Cyan
+            Write-Host "  Modelo: $modelo" -ForegroundColor Green
+            Write-Host ""
+            Write-Host "  Abriendo OpenCode..." -ForegroundColor Yellow
+            Start-Sleep -Milliseconds 800
+            Clear-Host
+            & opencode
+            Clear-Host
+            Write-Host "============================================"
+            Write-Host "   Sesion terminada"
+            Write-Host "============================================"
+            Write-Host ""
+            Write-Host "  Ultima tarea:  $($tareaActual.desc)" -ForegroundColor Cyan
+            Write-Host "  Modelo usado:  $modelo" -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "  1. Continuar con el mismo modelo"
+            Write-Host "  2. Cambiar tipo de tarea (y modelo)"
+            Write-Host "  3. Volver al menu principal"
+            Write-Host ""
+            $post = Read-Host "Que deseas hacer?"
+            if ($post -eq "1") {
+                # continua el while con misma tarea y modelo
+            } elseif ($post -eq "2") {
+                Elegir-Por-Tarea
+                return
+            } else {
+                return
+            }
+        }
     } else {
         Write-Host "Opcion invalida." -ForegroundColor Red
         Start-Sleep -Milliseconds 800
@@ -314,11 +338,35 @@ while ($true) {
                 Write-Host "Primero selecciona un perfil (opcion 2)." -ForegroundColor Yellow
                 Start-Sleep -Seconds 1
             } else {
-                Clear-Host
-                Write-Host "Abriendo OpenCode con perfil '$perfilActivo'..."
-                Write-Host "(Para salir escribe /exit)"
-                Write-Host ""
-                & opencode
+                while ($true) {
+                    Clear-Host
+                    Write-Host "Abriendo OpenCode con perfil '$perfilActivo'..."
+                    Write-Host "(Para salir escribe /exit)"
+                    Write-Host ""
+                    & opencode
+                    Clear-Host
+                    Write-Host "============================================"
+                    Write-Host "   Sesion terminada"
+                    Write-Host "============================================"
+                    Write-Host ""
+                    if (Test-Path $CONFIG_FILE) {
+                        $cfg = Get-Content $CONFIG_FILE -Raw | ConvertFrom-Json
+                        Write-Host "  Modelo actual: $($cfg.model)" -ForegroundColor Yellow
+                    }
+                    Write-Host ""
+                    Write-Host "  1. Continuar con el mismo modelo"
+                    Write-Host "  2. Cambiar tipo de tarea (y modelo)"
+                    Write-Host "  3. Volver al menu principal"
+                    Write-Host ""
+                    $post = Read-Host "Que deseas hacer?"
+                    if ($post -eq "1") {
+                        # vuelve al inicio del while, reabre opencode con mismo modelo
+                    } elseif ($post -eq "2") {
+                        Elegir-Por-Tarea
+                    } else {
+                        break
+                    }
+                }
             }
         }
         "2" {
