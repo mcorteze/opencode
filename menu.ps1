@@ -179,6 +179,8 @@ function Ver-Modelos {
     Write-Host "  OPENROUTER (modelos gratis con cuenta Google/GitHub)" -ForegroundColor Cyan
     Write-Host "  openrouter/meta-llama/llama-3.3-70b-instruct:free"
     Write-Host "  openrouter/mistralai/mistral-7b-instruct:free"
+    Write-Host "  openrouter/deepseek/deepseek-chat-v3-0324:free   (chino, muy capaz)"
+    Write-Host "  openrouter/qwen/qwen3-235b-a22b:free             (chino, bueno para codigo)"
     Write-Host ""
     Write-Host "  ANTHROPIC / CLAUDE (pago)" -ForegroundColor Cyan
     Write-Host "  anthropic/claude-sonnet-4-6      recomendado"

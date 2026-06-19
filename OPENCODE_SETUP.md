@@ -233,6 +233,8 @@ El menú permite cambiar perfiles, ver modelos y abrir OpenCode directamente.
 ### OpenRouter (modelos gratis con cuenta Google/GitHub)
 - `openrouter/meta-llama/llama-3.3-70b-instruct:free`
 - `openrouter/mistralai/mistral-7b-instruct:free`
+- `openrouter/deepseek/deepseek-chat-v3-0324:free` — modelo chino, muy capaz
+- `openrouter/qwen/qwen3-235b-a22b:free` — modelo chino, bueno para código
 
 ### Anthropic / Claude (pago)
 - `anthropic/claude-sonnet-4-6` — recomendado (buena calidad/precio)
