@@ -1,18 +1,7 @@
 {
   "perfiles": [
-    {
-      "nombre": "Gmail 1",
-      "groq": "",
-      "openrouter": "",
-      "anthropic": "",
-      "openai": ""
-    },
-    {
-      "nombre": "Gmail 2",
-      "groq": "",
-      "openrouter": "",
-      "anthropic": "",
-      "openai": ""
-    }
+    { "nombre": "Gmail 1" },
+    { "nombre": "Gmail 2" },
+    { "nombre": "Gmail 3" }
   ]
 }
